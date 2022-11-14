@@ -19,7 +19,7 @@ StreamingGradientTree::StreamingGradientTree(std::vector<FeatureInfo> featureInf
         hasSplit[i] = false;
     }
     mNumNodes = 0;
-    StreamingGradientTree* self = this;
+    StreamingGradientTree *self = this;
     mRoot = new StreamingGradientTree::Node(options.initialPrediction, 1, hasSplit, self);
 
 }
@@ -46,7 +46,7 @@ int StreamingGradientTree::getDepth()
 
 void StreamingGradientTree::update(std::vector<int> features, GradHess gradHess)
 {
-    Node* leaf = mRoot->getLeaf(features);
+    Node *leaf = mRoot->getLeaf(features);
     leaf->update(features, gradHess);
     
     if (leaf->mInstances % mOptions.gracePeriod != 0)
@@ -127,7 +127,7 @@ StreamingGradientTree::Node* StreamingGradientTree::Node::getLeaf(std::vector<in
     else 
     {
         FeatureType featureType = parentClass->mFeatureInfo[mSplit.feature].type;
-        Node* c = nullptr;
+        Node *c = nullptr;
         
         FeatureType nominal = FeatureType::nominal;
         FeatureType ordinal = FeatureType::ordinal;

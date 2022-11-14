@@ -16,8 +16,8 @@ class StreamingGradientTree
     public :
     std::vector<FeatureInfo> mFeatureInfo;
     StreamingGradientTreeOptions mOptions;
-    class StreamingGradientTree::Node;
-    StreamingGradientTree::Node* mRoot;
+    class Node;
+    Node *mRoot;
     int mNumNodes;
     int mNumNodeUpdates;
     int mMaxDepth;
@@ -44,6 +44,7 @@ class StreamingGradientTree
         public :
         int mInstances;
         Node(double prediction, int depth, std::vector<bool> hasSplit, StreamingGradientTree *parentTree);
+        ~Node();
         void reset();
         Node* getLeaf(std::vector<int> features);
         void update(std::vector<int> features, GradHess gradHess);
