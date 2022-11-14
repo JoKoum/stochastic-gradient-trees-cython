@@ -5,7 +5,7 @@ from Cython.Build import cythonize
 extensions = [
     Extension(
         "SGTWrapper",
-        ["SGTWrapper.pyx", "cysgt/utils/StochasticGradientTree.cpp"],
+        ["cysgt/SGTWrapper.pyx", "cysgt/utils/StochasticGradientTree.cpp"],
         language="c++"
     )
 ]
