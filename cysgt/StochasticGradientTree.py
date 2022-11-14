@@ -3,7 +3,7 @@ from sklearn.base import BaseEstimator
 
 
 class SGTClassifier(StochasticGradientTree):
-    def __init__(self, objective=b"classification", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1):
+    def __init__(self, objective=b"classification", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1.0):
         super().__init__(
             ob=objective,
             binNo=bins,
@@ -21,7 +21,7 @@ class SGTClassifier(StochasticGradientTree):
 
   
 class SGTRegressor(StochasticGradientTree):
-    def __init__(self, objective=b"regression", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1):
+    def __init__(self, objective=b"regression", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1.0):
         super().__init__(
             ob=objective,
             binNo=bins,
@@ -48,7 +48,8 @@ class StochasticGradientTreeClassifier(SGTClassifier, BaseEstimator):
             m_lambda=m_lambda,
             gamma=gamma,
             upper_bounds=upper_bounds,
-            lower_bounds=lower_bounds
+            lower_bounds=lower_bounds,
+            learning_rate=1.0
             )
         self.objective=objective
         self.bins=bins
@@ -70,7 +71,8 @@ class StochasticGradientTreeRegressor(SGTRegressor, BaseEstimator):
             m_lambda=m_lambda,
             gamma=gamma,
             upper_bounds=upper_bounds,
-            lower_bounds=lower_bounds
+            lower_bounds=lower_bounds,
+            learning_rate=1.0
             )
         self.objective=objective
         self.bins=bins

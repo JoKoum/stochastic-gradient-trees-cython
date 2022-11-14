@@ -8,7 +8,7 @@
 #include <iostream>
 #include <algorithm>
 
-StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, std::vector<double> upper = {}, std::vector<double> lower = {}, double lr = 1)
+StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, std::vector<double> upper = {}, std::vector<double> lower = {}, double lr = 1.0)
 {
     bins = binNo;
     batchSize = batch_size;
@@ -17,7 +17,7 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     gamma = g;
     lower_bounds = lower;
     upper_bounds = upper;
-    learning_rate = l;
+    learning_rate = lr;
     obType = ob;
 
     if (obType == "classification")
@@ -246,7 +246,7 @@ void StochasticGradientTree::train(std::vector<int> x, double y)
         gradHess = squaredObjective.computeDerivatives(groundTruth, prediction);
     }
     
-    GradHess gh = gradHess[0];
+    GradHess gh = GradHess(gradHess[0].gradient * learning_rate, gradHess[0].hessian * learning_rate);
     tree->update(x, gh);
 
 }

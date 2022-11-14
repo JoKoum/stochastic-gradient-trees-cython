@@ -40,7 +40,7 @@ cdef class PyStochasticGradientTree:
     cdef vector[double] lower 
     cdef double lr
 
-    def __init__(self, char* ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, vector[double] upper = vector[double](), vector[double] lower = vector[double](), double lr = 1):
+    def __init__(self, char* ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, vector[double] upper = vector[double](), vector[double] lower = vector[double](), double lr = 1.0):
         self.thisptr = new StochasticGradientTree(ob, binNo, batch_size, epochNo, l, g, upper, lower, lr)
         self.ob = ob 
         self.binNo = binNo
