@@ -25,16 +25,16 @@ class GradHess
         hessian = hess;
     }
 
-    void add(GradHess *gradHess)
+    void add(GradHess gradHess)
     {
-        gradient += gradHess->gradient;
-        hessian += gradHess->hessian;
+        gradient += gradHess.gradient;
+        hessian += gradHess.hessian;
     }
 
-    void sub(GradHess *gradHess)
+    void sub(GradHess gradHess)
     {
-        gradient -= gradHess->gradient;
-        hessian -= gradHess->hessian;
+        gradient -= gradHess.gradient;
+        hessian -= gradHess.hessian;
     }
 
 };

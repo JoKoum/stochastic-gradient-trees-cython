@@ -22,11 +22,11 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
 
     if (obType == "classification")
     {
-       softmaxObjective = new SoftmaxCrossEntropy();
+        softmaxObjective = SoftmaxCrossEntropy();
     }
     else if (obType == "regression")
     {
-        squaredObjective = new SquaredError();
+        squaredObjective = SquaredError();
     }
 
     options = StreamingGradientTreeOptions();
@@ -239,14 +239,14 @@ void StochasticGradientTree::train(std::vector<int> x, double y)
     
     if (obType == "classification")
     {
-        gradHess = softmaxObjective->computeDerivatives(groundTruth, prediction);
+        gradHess = softmaxObjective.computeDerivatives(groundTruth, prediction);
     }
     else if (obType == "regression")
     {
-        gradHess = squaredObjective->computeDerivatives(groundTruth, prediction);
+        gradHess = squaredObjective.computeDerivatives(groundTruth, prediction);
     }
     
-    GradHess* gh = &gradHess[0];
+    GradHess gh = gradHess[0];
     tree->update(x, gh);
 
 }
@@ -293,7 +293,7 @@ std::vector<std::vector<double>> StochasticGradientTree::predictProba(std::vecto
     {
         for (int i = 0; i < logits.size(); i++)
         {
-            probs[i] = softmaxObjective->transfer({logits[i]});
+            probs[i] = softmaxObjective.transfer({logits[i]});
         }
 
         for (int i = 0; i < probs.size(); i++)

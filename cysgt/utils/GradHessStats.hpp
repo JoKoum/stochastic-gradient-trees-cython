@@ -11,8 +11,8 @@
 class GradHessStats
 {
     protected:
-    GradHess *mSum;
-    GradHess *mScaledVariance;
+    GradHess mSum;
+    GradHess mScaledVariance;
     double mScaledCovariance;
     int mObservations = 0;
     
@@ -20,8 +20,8 @@ class GradHessStats
     
     GradHessStats()
     {
-        mSum = new GradHess();
-        mScaledVariance = new GradHess();
+        mSum = GradHess();
+        mScaledVariance = GradHess();
         mScaledCovariance = 0.0;
     }
     
@@ -33,39 +33,39 @@ class GradHessStats
         }
         if (mObservations == 0)
         {
-            mSum = new GradHess(stats.mSum);
-            mScaledVariance = new GradHess(stats.mScaledVariance);
+            mSum = GradHess(stats.mSum);
+            mScaledVariance = GradHess(stats.mScaledVariance);
             mScaledCovariance = stats.mScaledCovariance;
             mObservations = stats.mObservations;
             return;
         }
         
-        GradHess *meanDiff = stats.getMean();
-        meanDiff->sub(getMean());
+        GradHess meanDiff = stats.getMean();
+        meanDiff.sub(getMean());
         int n1 = mObservations;
         int n2 = stats.mObservations;
         
         // Do scaled variance bit (see Wikipedia page on "Algorithms for calculating variance", section about parallel calculation)
-        mScaledVariance->gradient += stats.mScaledVariance->gradient + pow(meanDiff->gradient,2.0) * (n1 * n2) / (n1 + n2);
-        mScaledVariance->hessian += stats.mScaledVariance->hessian + pow(meanDiff->hessian,2.0) * (n1 * n2) / (n1 + n2);
+        mScaledVariance.gradient += stats.mScaledVariance.gradient + pow(meanDiff.gradient,2.0) * (n1 * n2) / (n1 + n2);
+        mScaledVariance.hessian += stats.mScaledVariance.hessian + pow(meanDiff.hessian,2.0) * (n1 * n2) / (n1 + n2);
         // Do scaled covariance bit (see "Numerically Stable, Single-Pass, Parallel Statistics Algorithms" (Bennett et al, 2009))
-        mScaledCovariance += stats.mScaledCovariance + meanDiff->gradient * meanDiff->hessian * (n1 * n2) / (n1 + n2);
+        mScaledCovariance += stats.mScaledCovariance + meanDiff.gradient * meanDiff.hessian * (n1 * n2) / (n1 + n2);
         // Do the other bits
-        mSum->add(stats.mSum);
+        mSum.add(stats.mSum);
         mObservations += stats.mObservations;
     }
     
-    void addObservation(GradHess *gradHess)
+    void addObservation(GradHess gradHess)
     {
-        GradHess *oldMean = getMean();
-        mSum->add(gradHess);
+        GradHess oldMean = getMean();
+        mSum.add(gradHess);
         mObservations++;
-        GradHess *newMean = getMean();
-        mScaledVariance->gradient += (gradHess->gradient - oldMean->gradient) * (gradHess->gradient - newMean->gradient);
-        mScaledVariance->hessian += (gradHess->hessian - oldMean->hessian) * (gradHess->hessian - newMean->hessian);
-        mScaledCovariance += (gradHess->gradient - oldMean->gradient) * (gradHess->hessian - newMean->hessian);
+        GradHess newMean = getMean();
+        mScaledVariance.gradient += (gradHess.gradient - oldMean.gradient) * (gradHess.gradient - newMean.gradient);
+        mScaledVariance.hessian += (gradHess.hessian - oldMean.hessian) * (gradHess.hessian - newMean.hessian);
+        mScaledCovariance += (gradHess.gradient - oldMean.gradient) * (gradHess.hessian - newMean.hessian);
     }
-    GradHess *getMean()
+    GradHess getMean()
     {
         if (mObservations == 0)
         {
@@ -73,10 +73,10 @@ class GradHessStats
         }
         else 
         {
-            return new GradHess(mSum->gradient / mObservations, mSum->hessian / mObservations);
+            return new GradHess(mSum.gradient / mObservations, mSum.hessian / mObservations);
         }
     }
-    GradHess *getVariance()
+    GradHess getVariance()
     {
         if (mObservations < 2)
         {
@@ -84,7 +84,7 @@ class GradHessStats
         }
         else 
         {
-            return new GradHess(mScaledVariance->gradient / (mObservations - 1), mScaledVariance->hessian / (mObservations - 1));
+            return new GradHess(mScaledVariance.gradient / (mObservations - 1), mScaledVariance.hessian / (mObservations - 1));
         }
     }
     double getCovariance()
@@ -104,15 +104,15 @@ class GradHessStats
     }
     double getDeltaLossMean(double deltaPrediction)
     {
-        GradHess *mean = getMean();
-        return deltaPrediction * mean->gradient + 0.5 * mean->hessian * pow(deltaPrediction,2.0);
+        GradHess mean = getMean();
+        return deltaPrediction * mean.gradient + 0.5 * mean.hessian * pow(deltaPrediction, 2.0);
     }
     double getDeltaLossVariance(double deltaPrediction)
     {
-        GradHess *variance = getVariance();
+        GradHess variance = getVariance();
         double covariance = getCovariance();
-        double gradTermVariance = pow(deltaPrediction,2.0) * variance->gradient;
-        double hessTermVariance = 0.25 * variance->hessian * pow(deltaPrediction,4.0);
+        double gradTermVariance = pow(deltaPrediction,2.0) * variance.gradient;
+        double hessTermVariance = 0.25 * variance.hessian * pow(deltaPrediction,4.0);
         return std::max(0.0,gradTermVariance + hessTermVariance + pow(deltaPrediction,3.0) * covariance);
     }
     static double combineMean(double m1, int n1, double m2, int n2)

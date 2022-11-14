@@ -16,7 +16,7 @@ class StreamingGradientTree
     public :
     std::vector<FeatureInfo> mFeatureInfo;
     StreamingGradientTreeOptions mOptions;
-    class Node;
+    class StreamingGradientTree::Node;
     StreamingGradientTree::Node* mRoot;
     int mNumNodes;
     int mNumNodeUpdates;
@@ -27,7 +27,7 @@ class StreamingGradientTree
     int getNumNodeUpdates();
     int getNumSplits();
     int getDepth();
-    void update(std::vector<int> features, GradHess *gradHess);
+    void update(std::vector<int> features, GradHess gradHess);
     double predict(std::vector<int> features);
     class Node
     {
@@ -43,15 +43,15 @@ class StreamingGradientTree
         std::vector<bool> mHasSplit;
         public :
         int mInstances;
-        Node(double prediction, int depth, std::vector<bool> &hasSplit, StreamingGradientTree *parentTree);
+        Node(double prediction, int depth, std::vector<bool> hasSplit, StreamingGradientTree *parentTree);
         void reset();
         Node* getLeaf(std::vector<int> features);
-        void update(std::vector<int> features, GradHess *gradHess);
+        void update(std::vector<int> features, GradHess gradHess);
         double predict();
         Split findBestSplit();
         void applySplit(Split split);
         protected:
-        double computeDeltaPrediction(GradHess *gradHess);
+        double computeDeltaPrediction(GradHess gradHess);
     };
 };
 

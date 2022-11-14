@@ -44,7 +44,7 @@ int StreamingGradientTree::getDepth()
     return mMaxDepth;
 }
 
-void StreamingGradientTree::update(std::vector<int> features, GradHess *gradHess)
+void StreamingGradientTree::update(std::vector<int> features, GradHess gradHess)
 {
     Node* leaf = mRoot->getLeaf(features);
     leaf->update(features, gradHess);
@@ -89,7 +89,7 @@ double StreamingGradientTree::computePValue(Split split, int instances)
     }
 }
 
-StreamingGradientTree::Node::Node(double prediction, int depth, std::vector<bool> &hasSplit, StreamingGradientTree *parentTree)
+StreamingGradientTree::Node::Node(double prediction, int depth, std::vector<bool> hasSplit, StreamingGradientTree *parentTree)
 {
     mPrediction = prediction;
     this->parentClass = parentTree;
@@ -159,7 +159,7 @@ StreamingGradientTree::Node* StreamingGradientTree::Node::getLeaf(std::vector<in
     }
 }
 
-void StreamingGradientTree::Node::update(std::vector<int> features, GradHess *gradHess)
+void StreamingGradientTree::Node::update(std::vector<int> features, GradHess gradHess)
 {
     mInstances++;
     for (int i = 0; i < features.size(); i++)
@@ -257,8 +257,7 @@ Split StreamingGradientTree::Node::findBestSplit()
                 int numRight = backwardCumulativeSum[j].getObservationCount();
                 double lossMean = GradHessStats::combineMean(lossMeanLeft, numLeft, lossMeanRight, numRight);
                 double lossVar = GradHessStats::combineVariance(lossMeanLeft, lossVarLeft, numLeft, lossMeanRight, lossVarRight, numRight);
-                //std::cout<<forwardMean->gradient<<" "<<forwardMean->hessian<<"\n";
-                //std::cout<<lossVar<<" "<<lossVarLeft<<" "<<lossVarRight<<"\n";
+                
                 if (lossMean < candidate.lossMean)
                 {
                     candidate.lossMean = lossMean + 2.0 * parentClass->mOptions.gamma / mInstances;
@@ -312,8 +311,8 @@ void StreamingGradientTree::Node::applySplit(Split split)
     {
         std::vector<Node*> children(2);
         mChildren = children;
-        mChildren[0] = new Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, parentClass);
-        mChildren[1] = new Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, parentClass);
+        mChildren[0] =  new Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, parentClass);
+        mChildren[1] =  new Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, parentClass);
     }
     else 
     {
@@ -323,7 +322,7 @@ void StreamingGradientTree::Node::applySplit(Split split)
     mSplitStats.clear();
 }
 
-double StreamingGradientTree::Node::computeDeltaPrediction(GradHess *gradHess)
+double StreamingGradientTree::Node::computeDeltaPrediction(GradHess gradHess)
 {
-    return -gradHess->gradient / (gradHess->hessian + 2.2250738585072014E-308 + parentClass->mOptions.lambda);
+    return -gradHess.gradient / (gradHess.hessian + 2.2250738585072014E-308 + parentClass->mOptions.lambda);
 }
