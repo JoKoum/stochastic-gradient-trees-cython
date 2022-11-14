@@ -21,6 +21,7 @@ setup(
     license="MIT",
     packages=['cysgt','cysgt.utils'],
     package_dir = {"cysgt": "cysgt"},
-    install_requires=["numpy>=1.20.2", "cython>=0.29.28", "pandas>=1.3.3", "scikit-learn>=0.24.2"],
+    install_requires=["numpy>=1.20.2", "cython>=0.29.28"],
+    ext_modules=cythonize(extensions),
     zip_safe=False
 )
