@@ -53,11 +53,11 @@ void StreamingGradientTree::update(std::vector<int> features, GradHess *gradHess
     {
         return;
     }
-    Split* bestSplit = leaf->findBestSplit();
+    Split bestSplit = leaf->findBestSplit();
 
     double p = computePValue(bestSplit, leaf->mInstances);
     
-    if (p < mOptions->delta && bestSplit->lossMean < 0.0)
+    if (p < mOptions->delta && bestSplit.lossMean < 0.0)
     {
         leaf->applySplit(bestSplit);
     }
@@ -68,13 +68,13 @@ double StreamingGradientTree::predict(std::vector<int> features)
     return mRoot->getLeaf(features)->predict();
 }
 
-double StreamingGradientTree::computePValue(Split* split, int instances)
+double StreamingGradientTree::computePValue(Split split, int instances)
 {
     // H0: the expected loss is zero
     // HA: the expected loss is not zero
     try
     {
-        double F = instances * pow(split->lossMean, 2.0) / split->lossVariance;
+        double F = instances * pow(split.lossMean, 2.0) / split.lossVariance;
         if (isnan(F))
         {
             throw std::logic_error("ibeta: Domain error!");
@@ -115,7 +115,6 @@ void StreamingGradientTree::Node::reset()
             splitStats[i][j] = new GradHessStats();
         }
     }
-
     mSplitStats = splitStats;
 }
 
@@ -127,23 +126,23 @@ StreamingGradientTree::Node* StreamingGradientTree::Node::getLeaf(std::vector<in
     }
     else 
     {
-        FeatureType featureType = parentClass->mFeatureInfo[mSplit->feature]->type;
+        FeatureType featureType = parentClass->mFeatureInfo[mSplit.feature]->type;
         Node* c = nullptr;
         
         FeatureType nominal = FeatureType::nominal;
         FeatureType ordinal = FeatureType::ordinal;
 
-        if (features[mSplit->feature] == -1)
+        if (features[mSplit.feature] == -1)
         {
             c = mChildren[0];
         }
         else if (featureType == nominal)
         {
-            c = mChildren[features[mSplit->feature]];
+            c = mChildren[features[mSplit.feature]];
         }
         else if (featureType == ordinal)
         {
-            if (features[mSplit->feature] <= mSplit->index)
+            if (features[mSplit.feature] <= mSplit.index)
             {
                 c = mChildren[0];
             }
@@ -179,19 +178,19 @@ double StreamingGradientTree::Node::predict()
     return mPrediction;
 }
 
-Split* StreamingGradientTree::Node::findBestSplit()
+Split StreamingGradientTree::Node::findBestSplit()
 {
-    Split* best = new Split();
+    Split best = Split();
     // We can try to update the prediction using the new gradient information
-    best->deltaPredictions = std::vector<double>{computeDeltaPrediction(mUpdateStats->getMean())};
-    best->lossMean = mUpdateStats->getDeltaLossMean(best->deltaPredictions[0]);
-    best->lossVariance = mUpdateStats->getDeltaLossVariance(best->deltaPredictions[0]);
-    best->feature = -1;
-    best->index = -1;
+    best.deltaPredictions = std::vector<double>{computeDeltaPrediction(mUpdateStats->getMean())};
+    best.lossMean = mUpdateStats->getDeltaLossMean(best.deltaPredictions[0]);
+    best.lossVariance = mUpdateStats->getDeltaLossVariance(best.deltaPredictions[0]);
+    best.feature = -1;
+    best.index = -1;
     for (int i = 0; i < mSplitStats.size(); i++)
     {
-        Split* candidate = new Split();
-        candidate->feature = i;
+        Split candidate = Split();
+        candidate.feature = i;
         
         FeatureType nominal = FeatureType::nominal;
         FeatureType ordinal = FeatureType::ordinal;
@@ -202,7 +201,7 @@ Split* StreamingGradientTree::Node::findBestSplit()
             {
                 continue;
             }
-            candidate->deltaPredictions = std::vector<double>(mSplitStats[i].size());
+            candidate.deltaPredictions = std::vector<double>(mSplitStats[i].size());
             double lossMean = 0.0;
             double lossVar = 0.0;
             int observations = 0;
@@ -213,13 +212,13 @@ Split* StreamingGradientTree::Node::findBestSplit()
                 double m = mSplitStats[i][j]->getDeltaLossMean(p);
                 double s = mSplitStats[i][j]->getDeltaLossVariance(p);
                 int n = mSplitStats[i][j]->getObservationCount();
-                candidate->deltaPredictions[j] = p;
+                candidate.deltaPredictions[j] = p;
                 lossMean = GradHessStats::combineMean(lossMean, observations, m, n);
                 lossVar = GradHessStats::combineVariance(lossMean, lossVar, observations, m, s, n);
                 observations += n;
             }
-            candidate->lossMean = lossMean + mSplitStats[i].size() * parentClass->mOptions->gamma / mInstances;
-            candidate->lossVariance = lossVar;
+            candidate.lossMean = lossMean + mSplitStats[i].size() * parentClass->mOptions->gamma / mInstances;
+            candidate.lossVariance = lossVar;
         }
         else if (parentClass->mFeatureInfo[i]->type == ordinal)
         {
@@ -244,8 +243,8 @@ Split* StreamingGradientTree::Node::findBestSplit()
                     backwardCumulativeSum[j]->add(backwardCumulativeSum[j + 1]);
                 }
             }
-            candidate->lossMean = std::numeric_limits<double>::infinity();
-            candidate->deltaPredictions = std::vector<double>(2);
+            candidate.lossMean = std::numeric_limits<double>::infinity();
+            candidate.deltaPredictions = std::vector<double>(2);
             for (int j = 0; j < forwardCumulativeSum.size(); j++)
             {               
                 double deltaPredLeft = computeDeltaPrediction(forwardCumulativeSum[j]->getMean());
@@ -260,13 +259,13 @@ Split* StreamingGradientTree::Node::findBestSplit()
                 double lossVar = GradHessStats::combineVariance(lossMeanLeft, lossVarLeft, numLeft, lossMeanRight, lossVarRight, numRight);
                 //std::cout<<forwardMean->gradient<<" "<<forwardMean->hessian<<"\n";
                 //std::cout<<lossVar<<" "<<lossVarLeft<<" "<<lossVarRight<<"\n";
-                if (lossMean < candidate->lossMean)
+                if (lossMean < candidate.lossMean)
                 {
-                    candidate->lossMean = lossMean + 2.0 * parentClass->mOptions->gamma / mInstances;
-                    candidate->lossVariance = lossVar;
-                    candidate->index = j;
-                    candidate->deltaPredictions[0] = deltaPredLeft;
-                    candidate->deltaPredictions[1] = deltaPredRight;
+                    candidate.lossMean = lossMean + 2.0 * parentClass->mOptions->gamma / mInstances;
+                    candidate.lossVariance = lossVar;
+                    candidate.index = j;
+                    candidate.deltaPredictions[0] = deltaPredLeft;
+                    candidate.deltaPredictions[1] = deltaPredRight;
                 }
             }
         }
@@ -274,7 +273,7 @@ Split* StreamingGradientTree::Node::findBestSplit()
         {
             std::cout << "Unhandled attribute type" << std::endl;
         }
-        if (candidate->lossMean < best->lossMean)
+        if (candidate.lossMean < best.lossMean)
         {
             best = candidate;
         }
@@ -282,12 +281,12 @@ Split* StreamingGradientTree::Node::findBestSplit()
     return best;
 }
 
-void StreamingGradientTree::Node::applySplit(Split* split)
+void StreamingGradientTree::Node::applySplit(Split split)
 {
     // Should we just update the prediction being made?
-    if (split->feature == -1)
+    if (split.feature == -1)
     {
-        mPrediction += split->deltaPredictions[0];
+        mPrediction += split.deltaPredictions[0];
         parentClass->mNumNodeUpdates++;
         reset();
         return;
@@ -295,26 +294,26 @@ void StreamingGradientTree::Node::applySplit(Split* split)
 
     mSplit = split;
     parentClass->mNumSplits++;
-    mHasSplit[split->feature] = true;
+    mHasSplit[split.feature] = true;
 
     FeatureType nominal = FeatureType::nominal;
     FeatureType ordinal = FeatureType::ordinal;
 
-    if (parentClass->mFeatureInfo[split->feature]->type == nominal)
+    if (parentClass->mFeatureInfo[split.feature]->type == nominal)
     {
-        std::vector<Node*> children(parentClass->mFeatureInfo[split->feature]->categories);
+        std::vector<Node*> children(parentClass->mFeatureInfo[split.feature]->categories);
         mChildren = children;
         for (int i = 0; i < mChildren.size(); i++)
         {
-            mChildren[i] = new Node(mPrediction + split->deltaPredictions[i], mDepth + 1, mHasSplit, parentClass);
+            mChildren[i] = new Node(mPrediction + split.deltaPredictions[i], mDepth + 1, mHasSplit, parentClass);
         }
     }
-    else if (parentClass->mFeatureInfo[split->feature]->type == ordinal)
+    else if (parentClass->mFeatureInfo[split.feature]->type == ordinal)
     {
         std::vector<Node*> children(2);
         mChildren = children;
-        mChildren[0] = new Node(mPrediction + split->deltaPredictions[0], mDepth + 1, mHasSplit, parentClass);
-        mChildren[1] = new Node(mPrediction + split->deltaPredictions[1], mDepth + 1, mHasSplit, parentClass);
+        mChildren[0] = new Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, parentClass);
+        mChildren[1] = new Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, parentClass);
     }
     else 
     {

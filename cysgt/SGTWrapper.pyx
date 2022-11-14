@@ -20,6 +20,7 @@ cdef extern from "utils/StochasticGradientTree.hpp":
         int getTotalNodes()
         void setLearningRate(double)
         void setBounds(vector[double], vector[double])
+        int getIsFit()
         int getClassifierType()
         vector[vector[int]] createFeatures(vector[vector[double]], vector[double], vector[double])
         void train(vector[int], double)
@@ -84,11 +85,14 @@ cdef class PyStochasticGradientTree:
     def getDepth(self):
         return self.thisptr.getDepth()
 
-    def getTotalNodes(self):
+    def get_total_nodes(self):
         return self.thisptr.getTotalNodes()
 
     def set_learning_rate(self, double lr):
-        self.thisptr.setLearningRate(lr)    
+        self.thisptr.setLearningRate(lr)
+
+    def is_fit(self):
+        return self.thisptr.getIsFit() 
         
     def fit(self, X, y):
         if hasattr(X, "dtypes") and hasattr(X, "__array__"):

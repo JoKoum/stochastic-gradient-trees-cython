@@ -12,7 +12,7 @@
 class StreamingGradientTree
 {   
     protected :
-    double computePValue(Split* split, int instances);
+    double computePValue(Split split, int instances);
     public :
     std::vector<FeatureInfo*> mFeatureInfo;
     StreamingGradientTreeOptions* mOptions;
@@ -36,7 +36,7 @@ class StreamingGradientTree
         protected:
         double mPrediction;
         std::vector<Node*> mChildren;
-        Split* mSplit;
+        Split mSplit;
         GradHessStats* mUpdateStats;
         std::vector<std::vector<GradHessStats*>> mSplitStats;
         int mDepth;
@@ -48,8 +48,8 @@ class StreamingGradientTree
         Node* getLeaf(std::vector<int> features);
         void update(std::vector<int> features, GradHess *gradHess);
         double predict();
-        Split* findBestSplit();
-        void applySplit(Split* split);
+        Split findBestSplit();
+        void applySplit(Split split);
         protected:
         double computeDeltaPrediction(GradHess *gradHess);
     };

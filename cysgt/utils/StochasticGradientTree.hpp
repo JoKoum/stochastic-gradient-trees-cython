@@ -48,7 +48,9 @@ class StochasticGradientTree
         int getDepth();
         int getTotalNodes();
         void setLearningRate(double lr);
+        double getLearningRate();
         void setBounds(std::vector<double> u, std::vector<double> l);
+        int getIsFit();
         int getClassifierType();
         std::vector<std::vector<int>> createFeatures(std::vector<std::vector<double>> X, std::vector<double> u, std::vector<double> l);
         std::vector<int> discretize(std::vector<double> observations);
@@ -57,7 +59,7 @@ class StochasticGradientTree
         std::vector<std::vector<double>> predictProba(std::vector<std::vector<double>> X);
     private:
         bool isFit;
-        int samplesSeen = 0;
+        size_t samplesSeen = 0;
 
 };
 #endif

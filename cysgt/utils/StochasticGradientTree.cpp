@@ -34,7 +34,7 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     options->lambda = lambda;
     options->gamma = gamma;
 
-    if ((upper_bounds.size()) == 0 & (lower_bounds.size() == 0))
+    if ((upper_bounds.size() == 0) & (lower_bounds.size() == 0))
     {
         MinMaxProvided = false;
     }
@@ -124,10 +124,20 @@ void StochasticGradientTree::setLearningRate(double lr)
     learning_rate = lr;
 }
 
+double StochasticGradientTree::getLearningRate()
+{
+    return learning_rate;
+}
+
 void StochasticGradientTree::setBounds(std::vector<double> u, std::vector<double> l)
 {
     upper_bounds = u;
     lower_bounds = l;
+}
+
+int StochasticGradientTree::getIsFit()
+{
+    return isFit;
 }
 
 int StochasticGradientTree::getClassifierType()
@@ -210,7 +220,7 @@ std::vector<int> StochasticGradientTree::discretize(std::vector<double> observat
             scaling = (observations[i] - lower_bounds[i]) / (upper_bounds[i] - lower_bounds[i]);
         }
 
-        scaled_observations = buckets[i] * scaling;
+        scaled_observations = (int)(buckets[i] * scaling);
         scaled_observations = std::min(buckets[i] -1, std::max(0, scaled_observations));
         discretized.push_back(scaled_observations);
     }

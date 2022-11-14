@@ -20,10 +20,10 @@ class GradHessStats
     
     GradHessStats()
     {
-            mSum = new GradHess();
-            mScaledVariance = new GradHess();
-            mScaledCovariance = 0.0;
-        }
+        mSum = new GradHess();
+        mScaledVariance = new GradHess();
+        mScaledCovariance = 0.0;
+    }
     
     void add(GradHessStats *stats)
     {

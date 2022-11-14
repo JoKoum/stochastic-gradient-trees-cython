@@ -16,6 +16,8 @@ class SGTClassifier(StochasticGradientTree):
             lr=learning_rate
             )
         self._estimator_type = 'classifier'
+        self.lr = learning_rate
+        self._isFit = self.is_fit()
 
   
 class SGTRegressor(StochasticGradientTree):
@@ -32,6 +34,8 @@ class SGTRegressor(StochasticGradientTree):
             lr=learning_rate
             )
         self._estimator_type = 'regressor'
+        self.lr = learning_rate
+        self._isFit = self.is_fit()
 
 
 class StochasticGradientTreeClassifier(SGTClassifier, BaseEstimator):
