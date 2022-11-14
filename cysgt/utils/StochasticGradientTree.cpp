@@ -29,10 +29,10 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
         squaredObjective = new SquaredError();
     }
 
-    options = new StreamingGradientTreeOptions();
-    options->gracePeriod = batch_size;
-    options->lambda = lambda;
-    options->gamma = gamma;
+    options = StreamingGradientTreeOptions();
+    options.gracePeriod = batch_size;
+    options.lambda = lambda;
+    options.gamma = gamma;
 
     if ((upper_bounds.size() == 0) & (lower_bounds.size() == 0))
     {
@@ -182,9 +182,9 @@ std::vector<std::vector<int>> StochasticGradientTree::createFeatures(std::vector
     if (!isFit)
     {
         FeatureType ordinal = FeatureType::ordinal;
-        FeatureInfo* fInfo = new FeatureInfo();
-        fInfo->setFeatureType(ordinal);
-        fInfo->setCategories(bins);
+        fInfo = FeatureInfo();
+        fInfo.setFeatureType(ordinal);
+        fInfo.setCategories(bins);
 
         for (int i = 0; i < X[0].size(); i++)
         {

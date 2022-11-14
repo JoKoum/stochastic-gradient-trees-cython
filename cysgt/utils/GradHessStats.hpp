@@ -25,34 +25,34 @@ class GradHessStats
         mScaledCovariance = 0.0;
     }
     
-    void add(GradHessStats *stats)
+    void add(GradHessStats stats)
     {
-        if (stats->mObservations == 0)
+        if (stats.mObservations == 0)
         {
             return;
         }
         if (mObservations == 0)
         {
-            mSum = new GradHess(stats->mSum);
-            mScaledVariance = new GradHess(stats->mScaledVariance);
-            mScaledCovariance = stats->mScaledCovariance;
-            mObservations = stats->mObservations;
+            mSum = new GradHess(stats.mSum);
+            mScaledVariance = new GradHess(stats.mScaledVariance);
+            mScaledCovariance = stats.mScaledCovariance;
+            mObservations = stats.mObservations;
             return;
         }
         
-        GradHess *meanDiff = stats->getMean();
+        GradHess *meanDiff = stats.getMean();
         meanDiff->sub(getMean());
         int n1 = mObservations;
-        int n2 = stats->mObservations;
+        int n2 = stats.mObservations;
         
         // Do scaled variance bit (see Wikipedia page on "Algorithms for calculating variance", section about parallel calculation)
-        mScaledVariance->gradient += stats->mScaledVariance->gradient + pow(meanDiff->gradient,2.0) * (n1 * n2) / (n1 + n2);
-        mScaledVariance->hessian += stats->mScaledVariance->hessian + pow(meanDiff->hessian,2.0) * (n1 * n2) / (n1 + n2);
+        mScaledVariance->gradient += stats.mScaledVariance->gradient + pow(meanDiff->gradient,2.0) * (n1 * n2) / (n1 + n2);
+        mScaledVariance->hessian += stats.mScaledVariance->hessian + pow(meanDiff->hessian,2.0) * (n1 * n2) / (n1 + n2);
         // Do scaled covariance bit (see "Numerically Stable, Single-Pass, Parallel Statistics Algorithms" (Bennett et al, 2009))
-        mScaledCovariance += stats->mScaledCovariance + meanDiff->gradient * meanDiff->hessian * (n1 * n2) / (n1 + n2);
+        mScaledCovariance += stats.mScaledCovariance + meanDiff->gradient * meanDiff->hessian * (n1 * n2) / (n1 + n2);
         // Do the other bits
-        mSum->add(stats->mSum);
-        mObservations += stats->mObservations;
+        mSum->add(stats.mSum);
+        mObservations += stats.mObservations;
     }
     
     void addObservation(GradHess *gradHess)

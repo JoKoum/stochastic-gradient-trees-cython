@@ -14,15 +14,15 @@ class StreamingGradientTree
     protected :
     double computePValue(Split split, int instances);
     public :
-    std::vector<FeatureInfo*> mFeatureInfo;
-    StreamingGradientTreeOptions* mOptions;
+    std::vector<FeatureInfo> mFeatureInfo;
+    StreamingGradientTreeOptions mOptions;
     class Node;
     StreamingGradientTree::Node* mRoot;
     int mNumNodes;
     int mNumNodeUpdates;
     int mMaxDepth;
     int mNumSplits;
-    StreamingGradientTree(std::vector<FeatureInfo*> &featureInfo, StreamingGradientTreeOptions* &options);
+    StreamingGradientTree(std::vector<FeatureInfo> featureInfo, StreamingGradientTreeOptions options);
     int getNumNodes();
     int getNumNodeUpdates();
     int getNumSplits();
@@ -37,8 +37,8 @@ class StreamingGradientTree
         double mPrediction;
         std::vector<Node*> mChildren;
         Split mSplit;
-        GradHessStats* mUpdateStats;
-        std::vector<std::vector<GradHessStats*>> mSplitStats;
+        GradHessStats mUpdateStats;
+        std::vector<std::vector<GradHessStats>> mSplitStats;
         int mDepth;
         std::vector<bool> mHasSplit;
         public :

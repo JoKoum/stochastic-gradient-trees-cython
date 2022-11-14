@@ -82,7 +82,7 @@ cdef class PyStochasticGradientTree:
     def getGamma(self):
         return self.thisptr.getGamma()
 
-    def getDepth(self):
+    def get_depth(self):
         return self.thisptr.getDepth()
 
     def get_total_nodes(self):

@@ -12,12 +12,12 @@
 class StochasticGradientTree
 {
     public:
-        StreamingGradientTreeOptions* options;
+        StreamingGradientTreeOptions options;
         StreamingGradientTree* tree;
         SoftmaxCrossEntropy* softmaxObjective;
         SquaredError* squaredObjective;
-        std::vector<FeatureInfo*> featureInfo;
-        FeatureInfo* fInfo;
+        std::vector<FeatureInfo> featureInfo;
+        FeatureInfo fInfo;
         std::string obType;
         int scaled_observations;
         std::vector<int> buckets;
