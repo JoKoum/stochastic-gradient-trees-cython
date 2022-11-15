@@ -19,9 +19,13 @@ StreamingGradientTree::StreamingGradientTree(std::vector<FeatureInfo> featureInf
         hasSplit[i] = false;
     }
     mNumNodes = 0;
-    StreamingGradientTree *self = this;
-    mRoot = new StreamingGradientTree::Node(options.initialPrediction, 1, hasSplit, self);
+    mRoot = new StreamingGradientTree::Node(options.initialPrediction, 1, hasSplit, this);
 
+}
+
+StreamingGradientTree::~StreamingGradientTree()
+{
+    delete mRoot;
 }
 
 int StreamingGradientTree::getNumNodes()
@@ -61,6 +65,7 @@ void StreamingGradientTree::update(std::vector<int> features, GradHess gradHess)
     {
         leaf->applySplit(bestSplit);
     }
+    leaf = nullptr;
 }
 
 double StreamingGradientTree::predict(std::vector<int> features)
@@ -100,6 +105,11 @@ StreamingGradientTree::Node::Node(double prediction, int depth, std::vector<bool
     reset();
 }
 
+StreamingGradientTree::Node::~Node()
+{
+    delete parentClass;
+}
+
 void StreamingGradientTree::Node::reset()
 {
     std::vector<std::vector<GradHessStats>> splitStats(parentClass->mFeatureInfo.size());
@@ -116,6 +126,7 @@ void StreamingGradientTree::Node::reset()
         }
     }
     mSplitStats = splitStats;
+    std::vector<std::vector<GradHessStats>>().swap(splitStats);
 }
 
 StreamingGradientTree::Node* StreamingGradientTree::Node::getLeaf(std::vector<int> features)
