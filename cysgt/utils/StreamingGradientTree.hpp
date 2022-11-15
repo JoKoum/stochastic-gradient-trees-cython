@@ -23,6 +23,8 @@ class StreamingGradientTree
     int mMaxDepth;
     int mNumSplits;
     StreamingGradientTree(std::vector<FeatureInfo> featureInfo, StreamingGradientTreeOptions options);
+    StreamingGradientTree();
+    ~StreamingGradientTree();
     int getNumNodes();
     int getNumNodeUpdates();
     int getNumSplits();
