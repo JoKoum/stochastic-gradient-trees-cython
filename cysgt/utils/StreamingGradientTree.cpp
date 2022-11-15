@@ -306,6 +306,7 @@ void StreamingGradientTree::Node::applySplit(Split split)
         {
             mChildren[i] = new Node(mPrediction + split.deltaPredictions[i], mDepth + 1, mHasSplit, parentClass);
         }
+        children.clear();
     }
     else if (parentClass->mFeatureInfo[split.feature].type == ordinal)
     {
@@ -313,6 +314,7 @@ void StreamingGradientTree::Node::applySplit(Split split)
         mChildren = children;
         mChildren[0] =  new Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, parentClass);
         mChildren[1] =  new Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, parentClass);
+        children.clear();
     }
     else 
     {
