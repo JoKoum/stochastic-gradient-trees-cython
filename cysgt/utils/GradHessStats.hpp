@@ -33,8 +33,8 @@ class GradHessStats
         }
         if (mObservations == 0)
         {
-            mSum = GradHess(stats.mSum);
-            mScaledVariance = GradHess(stats.mScaledVariance);
+            mSum = GradHess(stats.mSum.gradient, stats.mSum.hessian);
+            mScaledVariance = GradHess(stats.mScaledVariance.gradient, stats.mScaledVariance.hessian);
             mScaledCovariance = stats.mScaledCovariance;
             mObservations = stats.mObservations;
             return;
@@ -69,22 +69,22 @@ class GradHessStats
     {
         if (mObservations == 0)
         {
-            return new GradHess(0.0, 0.0);
+            return GradHess(0.0, 0.0);
         }
         else 
         {
-            return new GradHess(mSum.gradient / mObservations, mSum.hessian / mObservations);
+            return GradHess(mSum.gradient / mObservations, mSum.hessian / mObservations);
         }
     }
     GradHess getVariance()
     {
         if (mObservations < 2)
         {
-            return new GradHess(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
+            return GradHess(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity());
         }
         else 
         {
-            return new GradHess(mScaledVariance.gradient / (mObservations - 1), mScaledVariance.hessian / (mObservations - 1));
+            return GradHess(mScaledVariance.gradient / (mObservations - 1), mScaledVariance.hessian / (mObservations - 1));
         }
     }
     double getCovariance()

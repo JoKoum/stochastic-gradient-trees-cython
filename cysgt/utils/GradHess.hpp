@@ -13,11 +13,11 @@ class GradHess
         hessian = 0;
     }    
 
-    GradHess(GradHess *gradHess)
-    {
-        gradient = gradHess->gradient;
-        hessian = gradHess->hessian;
-    } 
+    // GradHess(GradHess *gradHess)
+    // {
+    //     gradient = gradHess->gradient;
+    //     hessian = gradHess->hessian;
+    // } 
 
     GradHess(double grad, double hess)
     {
