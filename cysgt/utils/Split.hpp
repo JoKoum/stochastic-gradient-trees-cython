@@ -5,11 +5,19 @@ class Split
 {
     // lossMean and lossVariance are actually statistics of the approximation to the *change* in loss.
     public:
-    double lossMean = 0;
-    double lossVariance = 0;
+    double lossMean;
+    double lossVariance;
     std::vector<double> deltaPredictions;
-    int feature = -1;
-    int index = -1;
+    int feature;
+    int index;
+
+    Split()
+    {
+        lossMean = 0;
+        lossVariance = 0;
+        feature = -1;
+        index = -1;
+    }
 
     void setLossMean(double lossMe)
     {

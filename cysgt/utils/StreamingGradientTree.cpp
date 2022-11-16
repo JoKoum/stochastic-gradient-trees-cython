@@ -80,10 +80,6 @@ double StreamingGradientTree::computePValue(Split split, int instances)
     try
     {
         double F = instances * pow(split.lossMean, 2.0) / split.lossVariance;
-        if (isnan(F))
-        {
-            throw std::logic_error("ibeta: Domain error!");
-        }
         return Statistics::FProbability(F, 1, instances - 1);
     }
     catch (std::logic_error e)
@@ -139,19 +135,16 @@ StreamingGradientTree::Node* StreamingGradientTree::Node::getLeaf(std::vector<in
     {
         FeatureType featureType = parentClass->mFeatureInfo[mSplit.feature].type;
         Node *c = nullptr;
-        
-        FeatureType nominal = FeatureType::nominal;
-        FeatureType ordinal = FeatureType::ordinal;
 
         if (features[mSplit.feature] == -1)
         {
             c = mChildren[0];
         }
-        else if (featureType == nominal)
+        else if (featureType == FeatureType::nominal)
         {
             c = mChildren[features[mSplit.feature]];
         }
-        else if (featureType == ordinal)
+        else if (featureType == FeatureType::ordinal)
         {
             if (features[mSplit.feature] <= mSplit.index)
             {
@@ -203,10 +196,7 @@ Split StreamingGradientTree::Node::findBestSplit()
         Split candidate = Split();
         candidate.feature = i;
         
-        FeatureType nominal = FeatureType::nominal;
-        FeatureType ordinal = FeatureType::ordinal;
-
-        if (parentClass->mFeatureInfo[i].type == nominal)
+        if (parentClass->mFeatureInfo[i].type == FeatureType::nominal)
         {
             if (mHasSplit[i])
             {
@@ -231,7 +221,7 @@ Split StreamingGradientTree::Node::findBestSplit()
             candidate.lossMean = lossMean + mSplitStats[i].size() * parentClass->mOptions.gamma / mInstances;
             candidate.lossVariance = lossVar;
         }
-        else if (parentClass->mFeatureInfo[i].type == ordinal)
+        else if (parentClass->mFeatureInfo[i].type == FeatureType::ordinal)
         {
             std::vector<GradHessStats> forwardCumulativeSum(parentClass->mFeatureInfo[i].categories - 1);
             std::vector<GradHessStats> backwardCumulativeSum(parentClass->mFeatureInfo[i].categories - 1);
@@ -306,9 +296,6 @@ void StreamingGradientTree::Node::applySplit(Split split)
     parentClass->mNumSplits++;
     mHasSplit[split.feature] = true;
 
-    FeatureType nominal = FeatureType::nominal;
-    FeatureType ordinal = FeatureType::ordinal;
-
     if (parentClass->mFeatureInfo[split.feature].type == nominal)
     {
         std::vector<Node*> children(parentClass->mFeatureInfo[split.feature].categories);
@@ -319,7 +306,7 @@ void StreamingGradientTree::Node::applySplit(Split split)
         }
         std::vector<Node*>().swap(children);
     }
-    else if (parentClass->mFeatureInfo[split.feature].type == ordinal)
+    else if (parentClass->mFeatureInfo[split.feature].type == FeatureType::ordinal)
     {
         std::vector<Node*> children(2);
         mChildren = children;
