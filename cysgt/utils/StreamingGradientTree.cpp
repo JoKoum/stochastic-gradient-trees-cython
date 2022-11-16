@@ -11,7 +11,7 @@
 
 StreamingGradientTree::StreamingGradientTree(std::vector<FeatureInfo> featureInfo, StreamingGradientTreeOptions options)
 {
-    mFeatureInfo = featureInfo; //->clone();
+    mFeatureInfo = featureInfo;
     mOptions = options;
     std::vector<bool> hasSplit(mFeatureInfo.size());
     for (int i = 0; i < hasSplit.size(); i++)
@@ -97,7 +97,7 @@ StreamingGradientTree::Node::Node(double prediction, int depth, std::vector<bool
     parentClass->mNumNodes++;
     mDepth = depth;
     parentClass->mMaxDepth = std::max(parentClass->mMaxDepth, mDepth);
-    mHasSplit = hasSplit; //->clone();
+    mHasSplit = hasSplit;
     reset();
 }
 

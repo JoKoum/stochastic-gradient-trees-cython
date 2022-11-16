@@ -30,6 +30,7 @@ class StochasticGradientTree
         std::vector<double> lower_bounds;
         double learning_rate;
         bool MinMaxProvided;
+        std::vector<std::vector<double>> features;
 
         StochasticGradientTree(std::string ob, int binNo, int batch_size, int epochNo, double l, double g, std::vector<double> upper, std::vector<double> lower, double lr);
         int getEpochs();
@@ -58,6 +59,7 @@ class StochasticGradientTree
         std::vector<std::vector<double>> predictProba(std::vector<std::vector<double>> X);
     private:
         bool isFit;
+        size_t samplesSeen;
 
 };
 #endif

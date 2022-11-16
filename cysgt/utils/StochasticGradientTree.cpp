@@ -44,6 +44,8 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     }
 
     isFit = false;
+
+    samplesSeen = 0;
 }
 
 int StochasticGradientTree::getEpochs()
@@ -155,6 +157,20 @@ int StochasticGradientTree::getClassifierType()
 
 std::vector<std::vector<int>> StochasticGradientTree::createFeatures(std::vector<std::vector<double>> X, std::vector<double> u, std::vector<double> l)
 {    
+    if (samplesSeen < 1000)
+    {
+        if (!isFit)
+        {
+            features = X;
+        }
+        else
+        {
+            features.insert(features.end(), X.begin(), X.end());
+        }
+    }
+
+    samplesSeen += X.size();
+    
     if (!MinMaxProvided)
     {
         upper_bounds = u;
