@@ -33,6 +33,7 @@ class StochasticGradientTree
         std::vector<std::vector<double>> features;
 
         StochasticGradientTree(std::string ob, int binNo, int batch_size, int epochNo, double l, double g, std::vector<double> upper, std::vector<double> lower, double lr);
+        ~StochasticGradientTree();
         int getEpochs();
         void setEpochs(int ep);
         int getBins();

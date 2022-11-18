@@ -48,6 +48,11 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     samplesSeen = 0;
 }
 
+StochasticGradientTree::~StochasticGradientTree()
+{
+    delete tree;
+}
+
 int StochasticGradientTree::getEpochs()
 {
     return epochs;
@@ -110,11 +115,19 @@ double StochasticGradientTree::getGamma()
 
 int StochasticGradientTree::getDepth()
 {
+    if (!isFit)
+    {
+        return 0;
+    }
     return tree->getDepth();
 }
 
 int StochasticGradientTree::getTotalNodes()
 {
+    if (!isFit)
+    {
+        return 0;
+    }
     return tree->getNumNodes();
 }
 
@@ -279,7 +292,11 @@ std::vector<std::vector<double>> StochasticGradientTree::predictProba(std::vecto
 
     if (!isFit)
     {
-        tree = new StreamingGradientTree(featureInfo, options);
+        for (int i = 0; i < X.size(); i++)
+        {
+            proba[i] = {0, 0};
+        }
+        return proba;
     }
     
     for (int i = 0; i < features.size(); i++)
