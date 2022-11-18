@@ -174,11 +174,11 @@ std::vector<std::vector<int>> StochasticGradientTree::createFeatures(std::vector
     {
         if (!isFit)
         {
-            features = X;
+            samples = X;
         }
         else
         {
-            features.insert(features.end(), X.begin(), X.end());
+            samples.insert(samples.end(), X.begin(), X.end());
         }
     }
 

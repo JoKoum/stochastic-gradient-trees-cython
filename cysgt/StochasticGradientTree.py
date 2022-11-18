@@ -25,7 +25,6 @@ class SGTClassifier(StochasticGradientTree):
         self.upper_bounds=upper_bounds
         self.lower_bounds=lower_bounds
         self.lr = learning_rate
-        self.lr = learning_rate
     
 
     def __copy__(self):
