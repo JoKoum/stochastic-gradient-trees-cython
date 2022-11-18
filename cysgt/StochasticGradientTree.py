@@ -16,7 +16,20 @@ class SGTClassifier(StochasticGradientTree):
             lr=learning_rate
             )
         self._estimator_type = 'classifier'
+        self.objective=objective
+        self.bins=bins
+        self.batch_size=batch_size
+        self.epochs=epochs
+        self.m_lambda=m_lambda
+        self.gamma=gamma
+        self.upper_bounds=upper_bounds
+        self.lower_bounds=lower_bounds
         self.lr = learning_rate
+        self.lr = learning_rate
+    
+
+    def __copy__(self):
+        return SGTClassifier(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
 
   
 class SGTRegressor(StochasticGradientTree):
@@ -33,7 +46,19 @@ class SGTRegressor(StochasticGradientTree):
             lr=learning_rate
             )
         self._estimator_type = 'regressor'
+        self.objective=objective
+        self.bins=bins
+        self.batch_size=batch_size
+        self.epochs=epochs
+        self.m_lambda=m_lambda
+        self.gamma=gamma
+        self.upper_bounds=upper_bounds
+        self.lower_bounds=lower_bounds
         self.lr = learning_rate
+
+    
+    def __copy__(self):
+        return SGTRegressor(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
 
 
 class StochasticGradientTreeClassifier(SGTClassifier, BaseEstimator):
