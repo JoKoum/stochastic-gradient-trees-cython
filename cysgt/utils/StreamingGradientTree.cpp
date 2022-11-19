@@ -19,6 +19,7 @@ StreamingGradientTree::StreamingGradientTree(std::vector<FeatureInfo> featureInf
         hasSplit[i] = false;
     }
     mNumNodes = 0;
+    mMaxDepth = 0;
     mRoot = new StreamingGradientTree::Node(options.initialPrediction, 1, hasSplit, this);
 
 }
