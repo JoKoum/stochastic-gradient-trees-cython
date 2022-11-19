@@ -1,6 +1,6 @@
 from SGTWrapper import PyStochasticGradientTree as StochasticGradientTree
 from sklearn.base import BaseEstimator
-
+from copy import deepcopy
 
 class SGTClassifier(StochasticGradientTree):
     def __init__(self, objective=b"classification", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1.0):
@@ -26,10 +26,15 @@ class SGTClassifier(StochasticGradientTree):
         self.lower_bounds=lower_bounds
         self.lr = learning_rate
     
-
     def __copy__(self):
         return SGTClassifier(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
 
+    def __deepcopy__(self, memo):
+        result = self
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
   
 class SGTRegressor(StochasticGradientTree):
     def __init__(self, objective=b"regression", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1.0):
@@ -55,9 +60,15 @@ class SGTRegressor(StochasticGradientTree):
         self.lower_bounds=lower_bounds
         self.lr = learning_rate
 
-    
     def __copy__(self):
         return SGTRegressor(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
+
+    def __deepcopy__(self, memo):
+        result = self
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
 
 class StochasticGradientTreeClassifier(SGTClassifier, BaseEstimator):
