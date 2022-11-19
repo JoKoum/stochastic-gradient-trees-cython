@@ -48,11 +48,6 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     samplesSeen = 0;
 }
 
-StochasticGradientTree::~StochasticGradientTree()
-{
-    delete tree;
-}
-
 int StochasticGradientTree::getEpochs()
 {
     return epochs;
@@ -192,9 +187,8 @@ std::vector<std::vector<int>> StochasticGradientTree::createFeatures(std::vector
 
     if (!isFit)
     {
-        FeatureType ordinal = FeatureType::ordinal;
         fInfo = FeatureInfo();
-        fInfo.setFeatureType(ordinal);
+        fInfo.setFeatureType(FeatureType::ordinal);
         fInfo.setCategories(bins);
 
         for (int i = 0; i < X[0].size(); i++)
@@ -215,6 +209,7 @@ std::vector<std::vector<int>> StochasticGradientTree::createFeatures(std::vector
     return discretized;
 
 }
+
 std::vector<int> StochasticGradientTree::discretize(std::vector<double> observations)
 {
     std::vector<int> discretized = {};

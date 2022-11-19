@@ -114,6 +114,13 @@ cdef class PyStochasticGradientTree:
     def predict_proba(self, X):
         if hasattr(X, "dtypes") and hasattr(X, "__array__"):
             X = X.to_numpy()
+
+        isFit = self.thisptr.getFit()
+        if isFit == 0:
+            upper_bounds = np.max(X, axis=0).tolist()
+            lower_bounds = np.min(X, axis=0).tolist()
+            self.thisptr.setBounds(upper_bounds, lower_bounds)
+            
         X = X.tolist()
         return np.array(self.thisptr.predictProba(X))
 
