@@ -13,7 +13,7 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
     bins = binNo;
     batchSize = batch_size;
     epochs = epochNo;
-    lambda = l;
+    mLambda = l;
     gamma = g;
     lower_bounds = lower;
     upper_bounds = upper;
@@ -31,7 +31,7 @@ StochasticGradientTree::StochasticGradientTree(std::string ob, int binNo = 64, i
 
     options = StreamingGradientTreeOptions();
     options.gracePeriod = batch_size;
-    options.lambda = lambda;
+    options.lambda = mLambda;
     options.gamma = gamma;
 
     if ((upper_bounds.size() == 0) & (lower_bounds.size() == 0))
@@ -90,12 +90,12 @@ int StochasticGradientTree::getTrainBatchSize()
 
 void StochasticGradientTree::setLambda(double l)
 {
-    lambda = l;
+    mLambda = l;
 }
         
 double StochasticGradientTree::getLambda()
 {
-    return lambda;
+    return mLambda;
 }
 
 void StochasticGradientTree::setGamma(double g)

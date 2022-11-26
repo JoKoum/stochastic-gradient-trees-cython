@@ -25,6 +25,7 @@ class SGTClassifier(StochasticGradientTree):
         self.upper_bounds=upper_bounds
         self.lower_bounds=lower_bounds
         self.lr = learning_rate
+        self.size = 1
     
     def __copy__(self):
         return SGTClassifier(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
@@ -35,6 +36,12 @@ class SGTClassifier(StochasticGradientTree):
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result
+
+    def __getstate__(self):
+        return super(SGTClassifier, self).__getstate__()
+
+    def __setstate__(self, state):
+        super(SGTClassifier, self).__setstate__(state)
   
 class SGTRegressor(StochasticGradientTree):
     def __init__(self, objective=b"regression", bins=64, batch_size=200, epochs=20, m_lambda=0.1, gamma=1.0, upper_bounds=[], lower_bounds=[], learning_rate=1.0):
@@ -59,6 +66,7 @@ class SGTRegressor(StochasticGradientTree):
         self.upper_bounds=upper_bounds
         self.lower_bounds=lower_bounds
         self.lr = learning_rate
+        self.size = 1
 
     def __copy__(self):
         return SGTRegressor(self.objective, self.bins, self.batch_size, self.epochs, self.m_lambda, self.gamma, self.upper_bounds, self.lower_bounds, self.lr)
@@ -69,6 +77,12 @@ class SGTRegressor(StochasticGradientTree):
         for k, v in self.__dict__.items():
             setattr(result, k, deepcopy(v, memo))
         return result
+
+    def __getstate__(self):
+        return super(SGTRegressor, self).__getstate__()
+
+    def __setstate__(self, state):
+        super(SGTRegressor, self).__setstate__(state)
 
 
 class StochasticGradientTreeClassifier(SGTClassifier, BaseEstimator):

@@ -12,7 +12,7 @@ extensions = [
 
 setup(
     name="cysgt",
-    version="0.0.1",
+    version="0.1.5",
     description="Stochastic Gradient Trees implementation using Cython",
     long_description="Stochastic Gradient Trees by Henry Gouk, Bernhard Pfahringer, and Eibe Frank implementation in C++, Python. Based on the parer's accompanied repository code.",
     url="https://github.com/JoKoum/stochastic-gradient-trees-cython",

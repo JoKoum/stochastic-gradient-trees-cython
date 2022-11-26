@@ -24,7 +24,7 @@ class StochasticGradientTree
         int bins;
         int batchSize;
         int epochs;
-        double lambda;
+        double mLambda;
         double gamma;
         std::vector<double> upper_bounds;
         std::vector<double> lower_bounds;

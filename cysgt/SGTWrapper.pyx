@@ -1,9 +1,21 @@
 from libcpp.vector cimport vector
 import numpy as np
+from cpython.mem cimport PyMem_Malloc, PyMem_Free
+from libc.string cimport memcpy
+from libcpp.string cimport string
 
 cdef extern from "utils/StochasticGradientTree.hpp":
     cdef cppclass StochasticGradientTree:
-        StochasticGradientTree(char*, int, int, int, double, double, vector[double], vector[double], double)
+        string obType
+        int bins
+        int batchSize
+        int epochs
+        double mLambda
+        double gamma
+        vector[double] upper_bounds
+        vector[double] lower_bounds
+        double learning_rate
+        StochasticGradientTree(string, int, int, int, double, double, vector[double], vector[double], double)
         int getEpochs()
         void setEpochs(int)
         int getBins()
@@ -29,8 +41,8 @@ cdef extern from "utils/StochasticGradientTree.hpp":
 
 
 cdef class PyStochasticGradientTree:
-    cdef StochasticGradientTree* thisptr
-    cdef char* ob
+    cdef StochasticGradientTree *_thisptr
+    cdef string ob
     cdef int binNo
     cdef int batch_size 
     cdef int epochNo 
@@ -40,8 +52,8 @@ cdef class PyStochasticGradientTree:
     cdef vector[double] lower 
     cdef double lr
 
-    def __init__(self, char* ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, vector[double] upper = vector[double](), vector[double] lower = vector[double](), double lr = 1.0):
-        self.thisptr = new StochasticGradientTree(ob, binNo, batch_size, epochNo, l, g, upper, lower, lr)
+    def __init__(self, string ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, vector[double] upper = vector[double](), vector[double] lower = vector[double](), double lr = 1.0):
+        self._thisptr = new StochasticGradientTree(ob, binNo, batch_size, epochNo, l, g, upper, lower, lr)
         self.ob = ob 
         self.binNo = binNo
         self.batch_size = batch_size
@@ -52,82 +64,119 @@ cdef class PyStochasticGradientTree:
         self.lower = lower
         self.lr = lr
 
+    cpdef bytes get_data(self):
+        if self._thisptr == NULL:
+            return None
+        return <bytes>(<char *>self._thisptr)[:sizeof(StochasticGradientTree) * self.size]
+
+    cpdef void set_data(self, bytes thisptr, long size):
+        PyMem_Free(self._thisptr)
+        self.size = size
+        self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree) * self.size)
+        if not self._thisptr:
+            raise MemoryError()
+        memcpy(self._thisptr, <char *>thisptr, sizeof(StochasticGradientTree) * self.size)
+
+    property thisptr:
+        def __get__(self):    
+            return [(self._thisptr[i].obType, self._thisptr[i].bins,
+                self._thisptr[i].batchSize, self._thisptr[i].epochs,
+                self._thisptr[i].mLambda, self._thisptr[i].gamma,
+                self._thisptr[i].upper_bounds, self._thisptr[i].lower_bounds,
+                self._thisptr[i].learning_rate)
+                    for i in range(0, self.size)]
+        def __set__(self, values):
+            self.size = len(values)
+            self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree) * self.size)
+            if not self._thisptr:
+                raise MemoryError()
+            for i, (ob, binNo, batch_size, epochNo, l, g, upper, lower, lr) in enumerate(values):
+                self._thisptr[i].obType = ob
+                self._thisptr[i].bins = binNo
+                self._thisptr[i].batchSize = batch_size
+                self._thisptr[i].epochs = epochNo
+                self._thisptr[i].mLambda = l
+                self._thisptr[i].gamma = g
+                self._thisptr[i].upper_bounds = upper
+                self._thisptr[i].lower_bounds = lower
+                self._thisptr[i].learning_rate = lr
+    
     def setEpochs(self, int d):
-        self.thisptr.setEpochs(d)
+        self._thisptr.setEpochs(d)
     
     def getEpochs(self):
-        return self.thisptr.getEpochs()
+        return self._thisptr.getEpochs()
 
     def setBins(self, int b):
-        self.thisptr.setBins(b)
+        self._thisptr.setBins(b)
     
     def getBins(self):
-        return self.thisptr.getBins()
+        return self._thisptr.getBins()
 
     def setTrainBatchSize(self, int bs):
-        self.thisptr.setTrainBatchSize(bs)
+        self._thisptr.setTrainBatchSize(bs)
 
     def getTrainBatchSize(self):
-        return self.thisptr.getTrainBatchSize()
+        return self._thisptr.getTrainBatchSize()
 
     def setLambda(self, double l):
-        self.thisptr.setLambda(l)
+        self._thisptr.setLambda(l)
     
     def getLambda(self):
-        return self.thisptr.getLambda()
+        return self._thisptr.getLambda()
 
     def setGamma(self, double g):
-        self.thisptr.setGamma(g)
+        self._thisptr.setGamma(g)
 
     def getGamma(self):
-        return self.thisptr.getGamma()
+        return self._thisptr.getGamma()
 
     def get_depth(self):
-        return self.thisptr.getDepth()
+        return self._thisptr.getDepth()
 
     def get_total_nodes(self):
-        return self.thisptr.getTotalNodes()
+        return self._thisptr.getTotalNodes()
 
     def set_learning_rate(self, double lr):
-        self.thisptr.setLearningRate(lr)
+        self._thisptr.setLearningRate(lr)
 
     def is_fit(self):
-        return self.thisptr.getIsFit() 
+        return self._thisptr.getIsFit() 
         
     def fit(self, X, y):
         if hasattr(X, "dtypes") and hasattr(X, "__array__"):
             X = X.to_numpy()
 
-        isFit = self.thisptr.getFit()
+        isFit = self._thisptr.getFit()
         if isFit == 0:
             upper_bounds = np.max(X, axis=0).tolist()
             lower_bounds = np.min(X, axis=0).tolist()
-            self.thisptr.setBounds(upper_bounds, lower_bounds)
+            self._thisptr.setBounds(upper_bounds, lower_bounds)
 
         X = X.tolist()
 
         if 'pandas' in str(type(y)):
             y = y.to_numpy().tolist()
 
-        self.thisptr.fit(X, y)
+        self._thisptr.fit(X, y)
     
     def predict_proba(self, X):
         if hasattr(X, "dtypes") and hasattr(X, "__array__"):
             X = X.to_numpy()
 
-        isFit = self.thisptr.getFit()
+        isFit = self._thisptr.getFit()
         if isFit == 0:
             upper_bounds = np.max(X, axis=0).tolist()
             lower_bounds = np.min(X, axis=0).tolist()
-            self.thisptr.setBounds(upper_bounds, lower_bounds)
+            self._thisptr.setBounds(upper_bounds, lower_bounds)
             
         X = X.tolist()
-        return np.array(self.thisptr.predictProba(X))
+        return np.array(self._thisptr.predictProba(X))
 
     def predict(self, X):        
         y_pred = self.predict_proba(X)
 
-        classifier = self.thisptr.getClassifierType()
+        classifier = self._thisptr.getClassifierType()
 
         if classifier == 0:
             return [np.argmax(pred) for pred in y_pred]
@@ -138,8 +187,10 @@ cdef class PyStochasticGradientTree:
         return PyStochasticGradientTree(self.ob, self.binNo, self.batch_size, self.epochNo, self.l, self.g, self.upper, self.lower, self.lr)
 
     def __dealloc__(self):
-        if not self.thisptr == NULL:
-            del self.thisptr
-    
-    def __reduce__(self):
-        return (self.__class__, (self.ob, self.binNo, self.batch_size, self.epochNo, self.l, self.g, self.upper, self.lower, self.lr))
+        PyMem_Free(self._thisptr)
+
+    def __getstate__(self):
+        return (self.get_data(), self.size)
+
+    def __setstate__(self, state):
+        self.set_data(*state)
