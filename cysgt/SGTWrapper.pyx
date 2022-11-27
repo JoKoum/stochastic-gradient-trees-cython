@@ -41,16 +41,16 @@ cdef extern from "utils/StochasticGradientTree.hpp":
 
 
 cdef class PyStochasticGradientTree:
-    cdef StochasticGradientTree *_thisptr
-    cdef string ob
-    cdef int binNo
-    cdef int batch_size 
-    cdef int epochNo 
-    cdef double l 
-    cdef double g 
-    cdef vector[double] upper 
-    cdef vector[double] lower 
-    cdef double lr
+    cpdef StochasticGradientTree *_thisptr
+    cpdef string ob
+    cpdef int binNo
+    cpdef int batch_size 
+    cpdef int epochNo 
+    cpdef double l 
+    cpdef double g 
+    cpdef vector[double] upper 
+    cpdef vector[double] lower 
+    cpdef double lr
 
     def __init__(self, string ob, int binNo = 64, int batch_size = 200, int epochNo = 20, double l = 0.1, double g = 1.0, vector[double] upper = vector[double](), vector[double] lower = vector[double](), double lr = 1.0):
         self._thisptr = new StochasticGradientTree(ob, binNo, batch_size, epochNo, l, g, upper, lower, lr)
@@ -67,39 +67,36 @@ cdef class PyStochasticGradientTree:
     cpdef bytes get_data(self):
         if self._thisptr == NULL:
             return None
-        return <bytes>(<char *>self._thisptr)[:sizeof(StochasticGradientTree) * self.size]
+        return <bytes>(<char *>self._thisptr)
 
-    cpdef void set_data(self, bytes thisptr, long size):
+    cpdef void set_data(self, bytes thisptr):
         PyMem_Free(self._thisptr)
-        self.size = size
-        self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree) * self.size)
+        self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree))
         if not self._thisptr:
             raise MemoryError()
-        memcpy(self._thisptr, <char *>thisptr, sizeof(StochasticGradientTree) * self.size)
+        memcpy(self._thisptr, <char *>thisptr, sizeof(StochasticGradientTree))
 
     property thisptr:
         def __get__(self):    
-            return [(self._thisptr[i].obType, self._thisptr[i].bins,
-                self._thisptr[i].batchSize, self._thisptr[i].epochs,
-                self._thisptr[i].mLambda, self._thisptr[i].gamma,
-                self._thisptr[i].upper_bounds, self._thisptr[i].lower_bounds,
-                self._thisptr[i].learning_rate)
-                    for i in range(0, self.size)]
+            return [(self._thisptr.obType, self._thisptr.bins,
+                self._thisptr.batchSize, self._thisptr.epochs,
+                self._thisptr.mLambda, self._thisptr.gamma,
+                self._thisptr.upper_bounds, self._thisptr.lower_bounds,
+                self._thisptr.learning_rate)]
         def __set__(self, values):
-            self.size = len(values)
-            self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree) * self.size)
+            self._thisptr = <StochasticGradientTree*>PyMem_Malloc(sizeof(StochasticGradientTree))
             if not self._thisptr:
                 raise MemoryError()
-            for i, (ob, binNo, batch_size, epochNo, l, g, upper, lower, lr) in enumerate(values):
-                self._thisptr[i].obType = ob
-                self._thisptr[i].bins = binNo
-                self._thisptr[i].batchSize = batch_size
-                self._thisptr[i].epochs = epochNo
-                self._thisptr[i].mLambda = l
-                self._thisptr[i].gamma = g
-                self._thisptr[i].upper_bounds = upper
-                self._thisptr[i].lower_bounds = lower
-                self._thisptr[i].learning_rate = lr
+            ob, binNo, batch_size, epochNo, l, g, upper, lower, lr = values
+            self._thisptr.obType = ob
+            self._thisptr.bins = binNo
+            self._thisptr.batchSize = batch_size
+            self._thisptr.epochs = epochNo
+            self._thisptr.mLambda = l
+            self._thisptr.gamma = g
+            self._thisptr.upper_bounds = upper
+            self._thisptr.lower_bounds = lower
+            self._thisptr.learning_rate = lr
     
     def setEpochs(self, int d):
         self._thisptr.setEpochs(d)
@@ -190,7 +187,7 @@ cdef class PyStochasticGradientTree:
         PyMem_Free(self._thisptr)
 
     def __getstate__(self):
-        return (self.get_data(), self.size)
+        return self.get_data()
 
     def __setstate__(self, state):
-        self.set_data(*state)
+        self.set_data(state)
