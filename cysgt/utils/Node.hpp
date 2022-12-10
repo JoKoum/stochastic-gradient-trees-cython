@@ -12,7 +12,7 @@ class Node
 {
     public:
     double mPrediction;
-    std::vector<Node*> mChildren;
+    std::vector<Node> mChildren;
     Split mSplit;
     GradHessStats mUpdateStats;
     std::vector<std::vector<GradHessStats>> mSplitStats;

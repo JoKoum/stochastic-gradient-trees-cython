@@ -24,7 +24,6 @@ class StreamingGradientTree
     int mNumSplits;
     StreamingGradientTree(std::vector<FeatureInfo> featureInfo, StreamingGradientTreeOptions options);
     ~StreamingGradientTree();
-    void deleteNodes(Node *node);
     int getNumNodes();
     int getNumNodeUpdates();
     int getNumSplits();

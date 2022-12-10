@@ -27,23 +27,9 @@ StreamingGradientTree::StreamingGradientTree(std::vector<FeatureInfo> featureInf
 
 StreamingGradientTree::~StreamingGradientTree()
 {
-    deleteNodes(mRoot);
+    delete mRoot;
 }
 
-void StreamingGradientTree::deleteNodes(Node *node)
-{
-    if (node->mChildren[0] != NULL)
-    {
-        deleteNodes(node->mChildren[0]);
-    }
-
-    if (node->mChildren[1] != NULL)
-    {
-        deleteNodes(node->mChildren[1]);
-    }
-
-    delete node;
-}
 
 int StreamingGradientTree::getNumNodes()
 {
@@ -81,7 +67,7 @@ void StreamingGradientTree::update(std::vector<int> features, GradHess gradHess)
             {
                 mNumNodes += 2;
             }
-            mMaxDepth = std::max(mMaxDepth, leaf->mChildren[0]->mDepth);
+            mMaxDepth = std::max(mMaxDepth, leaf->mChildren[0].mDepth);
         }
     }
     leaf = nullptr;

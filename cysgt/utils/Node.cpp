@@ -56,21 +56,21 @@ Node* Node::getLeaf(std::vector<int> features)
 
         if (features[mSplit.feature] == -1)
         {
-            c = mChildren[0];
+            c = &mChildren[0];
         }
         else if (featureType == FeatureType::nominal)
         {
-            c = mChildren[features[mSplit.feature]];
+            c = &mChildren[features[mSplit.feature]];
         }
         else if (featureType == FeatureType::ordinal)
         {
             if (features[mSplit.feature] <= mSplit.index)
             {
-                c = mChildren[0];
+                c = &mChildren[0];
             }
             else 
             {
-                c = mChildren[1];
+                c = &mChildren[1];
             }
         }
         else 
@@ -222,13 +222,13 @@ void Node::applySplit(Split split)
     {
         for (int i = 0; i < mChildren.size(); i++)
         {
-            mChildren.push_back(new Node(mPrediction + split.deltaPredictions[i], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
+            mChildren.push_back(Node(mPrediction + split.deltaPredictions[i], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
         }
     }
     else if (mFeatureInfo[split.feature].type == FeatureType::ordinal)
     {
-        mChildren.push_back(new Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
-        mChildren.push_back(new Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
+        mChildren.push_back(Node(mPrediction + split.deltaPredictions[0], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
+        mChildren.push_back(Node(mPrediction + split.deltaPredictions[1], mDepth + 1, mHasSplit, mFeatureInfo, mOptions));
     }
     else 
     {
