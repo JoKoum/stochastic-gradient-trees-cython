@@ -11,6 +11,7 @@
 class Node
 {
     public:
+    Node *c;
     double mPrediction;
     std::vector<Node> mChildren;
     Split mSplit;

@@ -52,7 +52,7 @@ Node* Node::getLeaf(std::vector<int> features)
     else 
     {
         FeatureType featureType = mFeatureInfo[mSplit.feature].type;
-        Node *c = nullptr;
+        c = nullptr;
 
         if (features[mSplit.feature] == -1)
         {
