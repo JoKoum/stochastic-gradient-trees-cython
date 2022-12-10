@@ -100,6 +100,11 @@ double Node::predict()
     return mPrediction;
 }
 
+bool Node::checkIfSplit()
+{
+    return isSplit;
+}
+
 Split Node::findBestSplit()
 {
     Split best = Split();
@@ -205,6 +210,7 @@ void Node::applySplit(Split split)
     if (split.feature == -1)
     {
         mPrediction += split.deltaPredictions[0];
+        isSplit = false;
         reset();
         return;
     }
@@ -228,6 +234,7 @@ void Node::applySplit(Split split)
     {
         std::cout << "Unhandled attribute type" << std::endl;
     }
+    isSplit = true;
     // Free up memory used by the split stats
     mSplitStats.clear();
 }

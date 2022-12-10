@@ -71,15 +71,18 @@ void StreamingGradientTree::update(std::vector<int> features, GradHess gradHess)
     if (p < mOptions.delta && bestSplit.lossMean < 0.0)
     {
         leaf->applySplit(bestSplit);
-        if (mFeatureInfo[0].type == FeatureType::nominal)
+        if (leaf->checkIfSplit() == true)
         {
-            mNumNodes += leaf->mChildren.size();
+            if (mFeatureInfo[0].type == FeatureType::nominal)
+            {
+                mNumNodes += leaf->mChildren.size();
+            }
+            else
+            {
+                mNumNodes += 2;
+            }
+            mMaxDepth = std::max(mMaxDepth, leaf->mChildren[0]->mDepth);
         }
-        else
-        {
-            mNumNodes += 2;
-        }
-        mMaxDepth++ ;
     }
     leaf = nullptr;
 }

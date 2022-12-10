@@ -21,12 +21,14 @@ class Node
     int mDepth;
     std::vector<bool> mHasSplit;
     int mInstances;
+    bool isSplit;
     Node(double prediction, int depth, std::vector<bool> hasSplit, std::vector<FeatureInfo> featureInfo, StreamingGradientTreeOptions options);
     ~Node();
     void reset();
     Node* getLeaf(std::vector<int> features);
     void update(std::vector<int> features, GradHess gradHess);
     double predict();
+    bool checkIfSplit();
     Split findBestSplit();
     void applySplit(Split split);
     protected:
